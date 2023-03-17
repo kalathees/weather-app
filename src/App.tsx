@@ -1,39 +1,57 @@
 import styled from 'styled-components';
-import SearchResults from './components/SearchResults';
-
-
+import Header from './components/Header';
+import Dashboard from './components/Dashboard'
+import { useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 const Container=styled.div`
     width:100%;
     max-width:1200px;
     margin-inline:auto;
-    height:100vh;
-    border-radius:8px;
+    border-radius:12px;
     margin-top:10px;
     margin-bottom:10px;
-    border:1px solid #a8fcff;
-    box-shadow: rgba(136, 215, 218, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 `
-const Header=styled.div`
-    text-align:center;
-    padding-top:28px;
-`
+
 function App() {
 
-  const handleSearch=()=>{
-      fetch("")
+
+  const [weather, setWeather] = useState<any>(null);
+  const [forecast, setForecast] = useState<any>(null);
+  const [units,setUnits]=useState("metrics")
+  const apiKey=process.env.WEATHER_API_KEY;
+  const apiKey2="97d401c1043dd009f86abccbbaf7f69a"
+  const handleSearch=async(city: string)=>{debugger
+
+    try {
+      const response=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey2}`)
+      const currentWeather=await response.json();
+      const responseTwo=await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey2}`)
+      const forecast=await responseTwo.json();
+      setWeather(currentWeather)
+      setForecast(forecast)
+      console.log(currentWeather)
+    } catch (error){
+      toast.error('An error occurred. Please try again later.');
+    }
+
+
+    }
 
 
 
-
-  }
 
 
   return (
+    <>
+    <ToastContainer />
     <Container>
-      <Header>Weather Application</Header>
-      <SearchResults />
+      <Header handleSearch={handleSearch}/>
+      {weather && forecast && <Dashboard weather={weather} forecast={forecast}/> }
+    </Container >
+    </>
 
-    </Container>
   );
 }
 
